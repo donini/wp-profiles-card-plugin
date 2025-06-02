@@ -15,8 +15,8 @@ import { useBlockProps } from '@wordpress/block-editor';
  *
  * @return {Element} Element to render.
  */
-export default function save() {
+export default function save( { attributes } ) {
 	return (
-		<div { ...useBlockProps.save() }>Card</div>
+		<div { ...useBlockProps.save() } dangerouslySetInnerHTML={{ __html: attributes.svgData }}></div>
 	);
 }

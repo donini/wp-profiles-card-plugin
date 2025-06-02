@@ -33,20 +33,18 @@ import './editor.scss';
  *
  * @return {Element} Element to render.
  */
-export default function Edit() {
-	const [card, setCard] = useState('')
-
+export default function Edit( { attributes, setAttributes } ) {
+	const url = 'https://cardpress.us/card?username=' + attributes.userName;
 	useEffect(() => {
-		// Fetch the card data from the external API
 		axios.get(
-			'https://cardpress.us/card?username=psykro',
+			url,
 		).then( ( response ) => {
-			setCard( response.data );
+			setAttributes( { svgData: response.data } );
 		} ).catch( ( error ) => {
 			console.error( error );
 		} );
 	}, []);
 	return (
-		<div { ...useBlockProps() } dangerouslySetInnerHTML={{ __html: card }}></div>
+		<div { ...useBlockProps() } dangerouslySetInnerHTML={{ __html: attributes.svgData }}></div>
 	);
 }
