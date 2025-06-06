@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-
+import axios from "axios";
+import ProfileCard from "./components/ProfileCard";
 /**
  * Retrieves the translation of text.
  *
@@ -14,6 +15,7 @@ import { __ } from '@wordpress/i18n';
  * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#useblockprops
  */
 import { useBlockProps } from '@wordpress/block-editor';
+
 
 /**
  * Lets webpack process CSS, SASS or SCSS files referenced in JavaScript files.
@@ -33,33 +35,21 @@ import './editor.scss';
  */
 export default function Edit( { attributes, setAttributes } ) {
 	const [data, setData] = useState([]);
-
+	const url = 'https://cardpress.us/json?username=' + attributes.userName;
 	useEffect(() => {
-
-		async function getJSON(url) {
-			try {
-				const response = await fetch(url);
-				if (!response.ok) {
-					throw new Error("HTTP error! status: ${response.status}");
-				}
-				const data = await response.json();
-				console.log(data);
-				return data;
-			} catch (error) {
-				console.error("Error fetching JSON:", error)
-			}
-		}
-
-		const url = 'https://cardpress.us/card?username=' + attributes.userName;
-		console.log( url );
-
-		const data = getJSON(url)
-			.then(jsonData => {
-				console.log( jsonData.data );
+		// Fetch JSON data from the URL using axios
+		axios.get(url)
+			.then( (response) => {
+				console.log(response.data);
+				setData(response.data);
 			})
-
+			.catch( (error) => {
+				console.error('Error fetching data:', error);
+			});
 	}, []);
 	return (
-		<div { ...useBlockProps() }>Card</div>
+		<div { ...useBlockProps() }>
+			<ProfileCard data={data} />
+		</div>
 	);
 }
