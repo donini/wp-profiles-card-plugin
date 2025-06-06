@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 
 /**
  * Retrieves the translation of text.
@@ -15,7 +14,6 @@ import { __ } from '@wordpress/i18n';
  * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#useblockprops
  */
 import { useBlockProps } from '@wordpress/block-editor';
-import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Lets webpack process CSS, SASS or SCSS files referenced in JavaScript files.
@@ -34,17 +32,34 @@ import './editor.scss';
  * @return {Element} Element to render.
  */
 export default function Edit( { attributes, setAttributes } ) {
-	const url = 'https://cardpress.us/card?username=' + attributes.userName;
+	const [data, setData] = useState([]);
+
 	useEffect(() => {
-		axios.get(
-			url,
-		).then( ( response ) => {
-			setAttributes( { svgData: response.data } );
-		} ).catch( ( error ) => {
-			console.error( error );
-		} );
+
+		async function getJSON(url) {
+			try {
+				const response = await fetch(url);
+				if (!response.ok) {
+					throw new Error("HTTP error! status: ${response.status}");
+				}
+				const data = await response.json();
+				console.log(data);
+				return data;
+			} catch (error) {
+				console.error("Error fetching JSON:", error)
+			}
+		}
+
+		const url = 'https://cardpress.us/card?username=' + attributes.userName;
+		console.log( url );
+
+		const data = getJSON(url)
+			.then(jsonData => {
+				console.log( jsonData.data );
+			})
+
 	}, []);
 	return (
-		<div { ...useBlockProps() } dangerouslySetInnerHTML={{ __html: attributes.svgData }}></div>
+		<div { ...useBlockProps() }>Card</div>
 	);
 }
