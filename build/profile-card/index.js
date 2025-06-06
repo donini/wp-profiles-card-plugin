@@ -4785,7 +4785,7 @@ function Edit({
   attributes,
   setAttributes
 }) {
-  const url = 'https://cardpress.us/card?username=' + attributes.userName;
+  const url = 'https://cardpress.us/json?username=' + attributes.userName;
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     axios__WEBPACK_IMPORTED_MODULE_6__["default"].get(url).then(response => {
       setAttributes({

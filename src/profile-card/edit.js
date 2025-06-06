@@ -34,7 +34,7 @@ import './editor.scss';
  * @return {Element} Element to render.
  */
 export default function Edit( { attributes, setAttributes } ) {
-	const url = 'https://cardpress.us/card?username=' + attributes.userName;
+	const url = 'https://cardpress.us/json?username=' + attributes.userName;
 	useEffect(() => {
 		axios.get(
 			url,
