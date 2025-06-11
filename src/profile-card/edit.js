@@ -15,7 +15,7 @@ import { __ } from '@wordpress/i18n';
  * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#useblockprops
  */
 import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
-import { PanelBody, TextControl } from '@wordpress/components';
+import { PanelBody, TextControl, Dashicon } from '@wordpress/components';
 
 /**
  * Lets webpack process CSS, SASS or SCSS files referenced in JavaScript files.
@@ -74,6 +74,25 @@ export default function Edit( { attributes, setAttributes } ) {
 		return badgeMatch ? badgeMatch[1] : '';
 	};
 
+	const getDashiconName = (classString) => {
+		// Remove 'dashicons' and 'dashicons-' prefixes and trim whitespace
+		if (!classString) return 'star-filled';
+		
+		let iconName = classString.trim();
+		
+		// Remove common prefixes
+		iconName = iconName.replace(/^dashicons\s+dashicons-/, '');
+		iconName = iconName.replace(/^dashicons-/, '');
+		iconName = iconName.replace(/^dashicons/, '');
+		
+		
+		// Trim any remaining whitespace
+		iconName = iconName.trim();
+		
+		// Return the cleaned icon name or fallback
+		return iconName || 'star-filled';
+	};
+
 	return (
 		<div {...useBlockProps()}>
 			<InspectorControls>
@@ -120,11 +139,12 @@ export default function Edit( { attributes, setAttributes } ) {
 							<div className="wp-profile-badges">
 								{profileData.badges.map((badge, index) => {
 									const badgeType = getBadgeTypeClass(badge.class);
+									const dashiconName = getDashiconName(badge.class);
 									
 									return (
 										<div key={index} className={`wp-profile-badge ${badgeType ? `badge-${badgeType}` : ''}`}>
 											<div className="wp-profile-badge-icon">
-												<span className={badge.class}></span>
+												<Dashicon icon={dashiconName} />
 											</div>
 											<span className="wp-profile-badge-label">{badge.name}</span>
 										</div>

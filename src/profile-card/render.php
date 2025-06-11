@@ -20,7 +20,7 @@ if (!function_exists('get_badge_type_class')) {
 }
 
 // Get the profile data from attributes
-$username = $attributes['username'] ?? 'psykro';
+$username = $attributes['userName'] ?? 'psykro';
 $profile_data = $attributes['profileData'] ?? null;
 
 ?>
