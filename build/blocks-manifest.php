@@ -9,7 +9,7 @@ return array(
 		'title' => 'Profile Card',
 		'category' => 'widgets',
 		'icon' => 'smiley',
-		'description' => 'Example block scaffolded with Create Block tool.',
+		'description' => 'Display a WordPress profile card with badges and user information.',
 		'example' => array(
 			
 		),
@@ -18,9 +18,11 @@ return array(
 				'type' => 'string',
 				'default' => 'psykro'
 			),
-			'svgData' => array(
-				'type' => 'string',
-				'default' => ''
+			'profileData' => array(
+				'type' => 'object',
+				'default' => array(
+					
+				)
 			)
 		),
 		'supports' => array(

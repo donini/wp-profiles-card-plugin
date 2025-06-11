@@ -16,6 +16,15 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
+
+/**
+ * Enqueue dashicons specifically when our block is present on the page
+ */
+function cardpress_enqueue_block_assets() {
+		wp_enqueue_style( 'dashicons' );
+}
+add_action( 'enqueue_block_assets', 'cardpress_enqueue_block_assets' );
+
 /**
  * Registers the block using a `blocks-manifest.php` file, which improves the performance of block type registration.
  * Behind the scenes, it also registers all assets so they can be enqueued

@@ -14,8 +14,8 @@ import { __ } from '@wordpress/i18n';
  *
  * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#useblockprops
  */
-import { useBlockProps } from '@wordpress/block-editor';
-import apiFetch from '@wordpress/api-fetch';
+import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
+import { PanelBody, TextControl, Dashicon } from '@wordpress/components';
 
 /**
  * Lets webpack process CSS, SASS or SCSS files referenced in JavaScript files.
@@ -34,17 +34,127 @@ import './editor.scss';
  * @return {Element} Element to render.
  */
 export default function Edit( { attributes, setAttributes } ) {
-	const url = 'https://cardpress.us/json?username=' + attributes.userName;
+	const { userName } = attributes;
+	const [profileData, setProfileData] = useState(null);
+	const [isLoading, setIsLoading] = useState(false);
+	const [error, setError] = useState('');
+
+	const fetchProfileData = async (user) => {
+		if (!user) return;
+		
+		setIsLoading(true);
+		setError('');
+		
+		try {
+			const response = await axios.get(`https://cardpress.us/json?username=${user}`);
+			
+			if (response.data && response.data.name) {
+				setProfileData(response.data);
+				setAttributes({ profileData: response.data });
+			} else {
+				setError('User not found or no data available');
+				setProfileData(null);
+				setAttributes({ profileData: null });
+			}
+		} catch (err) {
+			setError('Failed to fetch user data');
+			setProfileData(null);
+			setAttributes({ profileData: null });
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
 	useEffect(() => {
-		axios.get(
-			url,
-		).then( ( response ) => {
-			setAttributes( { svgData: response.data } );
-		} ).catch( ( error ) => {
-			console.error( error );
-		} );
-	}, []);
+		fetchProfileData(userName);
+	}, [userName]);
+
+	const getBadgeTypeClass = (classString) => {
+		const badgeMatch = classString.match(/badge-([a-zA-Z-]+)/);
+		return badgeMatch ? badgeMatch[1] : '';
+	};
+
+	const getDashiconName = (classString) => {
+		// Remove 'dashicons' and 'dashicons-' prefixes and trim whitespace
+		if (!classString) return 'star-filled';
+		
+		let iconName = classString.trim();
+		
+		// Remove common prefixes
+		iconName = iconName.replace(/^dashicons\s+dashicons-/, '');
+		iconName = iconName.replace(/^dashicons-/, '');
+		iconName = iconName.replace(/^dashicons/, '');
+		
+		
+		// Trim any remaining whitespace
+		iconName = iconName.trim();
+		
+		// Return the cleaned icon name or fallback
+		return iconName || 'star-filled';
+	};
+
 	return (
-		<div { ...useBlockProps() } dangerouslySetInnerHTML={{ __html: attributes.svgData }}></div>
+		<div {...useBlockProps()}>
+			<InspectorControls>
+				<PanelBody title={__('Profile Settings', 'profile-card')}>
+					<TextControl
+						label={__('WordPress Username', 'profile-card')}
+						value={userName}
+						onChange={(value) => setAttributes({ userName: value })}
+						help={__('Enter a WordPress.org username', 'profile-card')}
+						__next40pxDefaultSize={true}
+						__nextHasNoMarginBottom={true}
+					/>
+				</PanelBody>
+			</InspectorControls>
+
+			<div className="wp-profile-card">
+				{isLoading && (
+					<div className="wp-profile-loading">
+						<p>{__('Loading profile...', 'profile-card')}</p>
+					</div>
+				)}
+
+				{error && (
+					<div className="wp-profile-error">
+						<p>{error}</p>
+					</div>
+				)}
+
+				{profileData && !isLoading && (
+					<>
+						<div className="wp-profile-header">
+							<div className="wp-profile-avatar">
+								<img src={profileData.avatar} alt={profileData.name} />
+							</div>
+							<div className="wp-profile-info">
+								<div className="wp-profile-activity">WordPress Activity</div>
+								<h3 className="wp-profile-name">{profileData.name}</h3>
+								<p className="wp-profile-username">User: @{userName}</p>
+								<p className="wp-profile-member-since">Member Since: {profileData.memberSince}</p>
+							</div>
+						</div>
+
+						{profileData.badges && profileData.badges.length > 0 && (
+							<div className="wp-profile-badges">
+								{profileData.badges.map((badge, index) => {
+									const badgeType = getBadgeTypeClass(badge.class);
+									const dashiconName = getDashiconName(badge.class);
+									
+									return (
+										<div key={index} className={`wp-profile-badge ${badgeType ? `badge-${badgeType}` : ''}`}>
+											<div className="wp-profile-badge-icon">
+												<Dashicon icon={dashiconName} />
+											</div>
+											<span className="wp-profile-badge-label">{badge.name}</span>
+										</div>
+									);
+								})}
+							</div>
+						)}
+					</>
+				)}
+			</div>
+		</div>
 	);
 }
