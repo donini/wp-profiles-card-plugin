@@ -6,16 +6,16 @@
   "title": "Profile Card",
   "category": "widgets",
   "icon": "smiley",
-  "description": "Example block scaffolded with Create Block tool.",
+  "description": "Display a WordPress profile card with badges and user information.",
   "example": {},
   "attributes": {
     "userName": {
       "type": "string",
       "default": "psykro"
     },
-    "svgData": {
-      "type": "string",
-      "default": ""
+    "profileData": {
+      "type": "object",
+      "default": {}
     }
   },
   "supports": {
